@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>System sprzedaży biletów - Kino</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>System sprzedaży biletów - Kino</h1>
+  </header>
+
+  <section id="formularz">
+    <label for="film">Wybierz film:</label>
+    <select id="film">
+      <option value="Avengers: Endgame">Avengers: Endgame</option>
+      <option value="Matrix">Matrix</option>
+      <option value="Incepcja">Incepcja</option>
+      <option value="Król Lew">Król Lew</option>
+    </select>
+
+    <label for="data">Data:</label>
+    <input type="date" id="data" />
+
+    <label for="godzina">Godzina:</label>
+    <select id="godzina">
+      <option value="12:00">12:00</option>
+      <option value="15:00">15:00</option>
+      <option value="18:00">18:00</option>
+      <option value="21:00">21:00</option>
+    </select>
+  </section>
+
+  <section id="sala-container">
+    <h2>Wybierz miejsce</h2>
+    <div id="sala"></div>
+  </section>
+
+  <button id="kup-bilet">Kup bilet</button>
+
+  <section id="bilet-container" style="display:none;">
+    <h2>Twój bilet</h2>
+    <div id="bilet"></div>
+    <button id="drukuj-bilet">Pobierz / Drukuj bilet (PDF)</button>
+    <div id="qr"></div>
+  </section>
+
+  <!-- QRCode.js -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <!-- html2pdf.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

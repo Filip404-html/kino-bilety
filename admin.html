@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin - Skaner QR</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #001f3f;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 {
+    margin-bottom: 20px;
+    color: #ff4136;
+    text-shadow: 0 0 10px #ff4136;
+  }
+  #video {
+    border: 4px solid #ff4136;
+    border-radius: 10px;
+    width: 320px;
+    height: 240px;
+    background: #000;
+    object-fit: cover;
+  }
+  #result {
+    margin-top: 20px;
+    padding: 15px;
+    background: #0074d9;
+    border-radius: 10px;
+    min-width: 320px;
+    min-height: 50px;
+    font-size: 1.2em;
+    text-align: center;
+    box-shadow: 0 0 15px #0074d9;
+  }
+  #startBtn {
+    margin-top: 20px;
+    background: #ff4136;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 50px;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 0 10px #ff4136;
+    transition: background 0.3s ease;
+  }
+  #startBtn:hover {
+    background: #ff6659;
+  }
+</style>
+</head>
+<body>
+
+<h1>Admin - Skaner kodów QR</h1>
+<video id="video" autoplay muted></video>
+<button id="startBtn">Włącz kamerę i skanuj QR</button>
+<div id="result">Nie zeskanowano żadnego kodu.</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script>
+  const video = document.getElementById('video');
+  const startBtn = document.getElementById('startBtn');
+  const resultDiv = document.getElementById('result');
+
+  let scanning = false;
+  let videoStream = null;
+
+  function stopCamera() {
+    if (videoStream) {
+      videoStream.getTracks().forEach(track => track.stop());
+      videoStream = null;
+    }
+    scanning = false;
+  }
+
+  startBtn.addEventListener('click', () => {
+    if (scanning) {
+      stopCamera();
+      startBtn.textContent = 'Włącz kamerę i skanuj QR';
+      resultDiv.textContent = 'Skanowanie zatrzymane.';
+      video.srcObject = null;
+      return;
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        videoStream = stream;
+        video.srcObject = stream;
+        video.setAttribute('playsinline', true);
+        scanning = true;
+        startBtn.textContent = 'Zatrzymaj skanowanie';
+        resultDiv.textContent = 'Skanowanie...';
+
+        scan();
+      })
+      .catch(err => {
+        alert('Błąd dostępu do kamery: ' + err);
+      });
+  });
+
+  function scan() {
+    if (!scanning) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    if (canvas.width === 0 || canvas.height === 0) {
+      requestAnimationFrame(scan);
+      return;
+    }
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+    const code = jsQR(imageData.data, canvas.width, canvas.height, { inversionAttempts: "dontInvert" });
+    if (code) {
+      resultDiv.textContent = `Zeskanowano kod QR: ${code.data}`;
+      // Możesz tu dodać dalsze działania z zeskanowanym kodem
+      // np. walidację biletu, wysłanie do serwera itp.
+      // Zatrzymujemy kamerę po udanym skanie:
+      stopCamera();
+      startBtn.textContent = 'Włącz kamerę i skanuj QR';
+      video.srcObject = null;
+    } else {
+      resultDiv.textContent = 'Skanowanie...';
+      requestAnimationFrame(scan);
+    }
+  }
+</script>
+
+</body>
+</html>
