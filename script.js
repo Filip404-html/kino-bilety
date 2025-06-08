@@ -131,3 +131,13 @@ kupBiletBtn.addEventListener('click', kupBilet);
 drukujBiletBtn.addEventListener('click', generujPDF);
 
 stworzSale();
+
+function kupBilet() {
+  // ... istniejący kod ...
+  pokazBilet(bilet);
+
+  // Zapisz bilet do localStorage
+  const bilety = JSON.parse(localStorage.getItem('bilety')) || [];
+  bilety.push(bilet);
+  localStorage.setItem('bilety', JSON.stringify(bilety));
+}
